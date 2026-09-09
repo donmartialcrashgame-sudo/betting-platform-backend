@@ -6,16 +6,17 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "prisma generate && tsc -p tsconfig.json",
+    "build": "npx prisma generate && npx tsc -p tsconfig.json",
     "start": "node dist/server.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:deploy": "prisma migrate deploy",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:deploy": "npx prisma migrate deploy",
     "test": "vitest run"
   },
   "engines": { "node": ">=20" },
   "dependencies": {
     "@prisma/client": "latest",
+    "prisma": "latest",
     "bcryptjs": "latest",
     "cors": "latest",
     "dotenv": "latest",
@@ -33,7 +34,6 @@
     "@types/jsonwebtoken": "latest",
     "@types/node": "latest",
     "@types/ws": "latest",
-    "prisma": "latest",
     "tsx": "latest",
     "typescript": "latest",
     "vitest": "latest"
