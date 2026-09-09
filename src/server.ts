@@ -8,6 +8,7 @@ import { env } from './config/env';
 import { prisma } from './database/prisma';
 import authRoutes from './modules/auth/auth.routes';
 import giftRoutes from './modules/gifts/gifts.routes';
+import footballRoutes from './modules/football/football.routes';
 
 const app = express();
 app.set('trust proxy', 1);
@@ -27,6 +28,8 @@ app.get('/health', async (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/gifts', giftRoutes);
+// Public sports-data proxy. The API-Sports key stays on this server and is never sent to browsers.
+app.use('/api/football', footballRoutes);
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
