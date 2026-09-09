@@ -1,57 +1,57 @@
-# Betting Platform Backend
+# betting-platform-backend
 
-Backend foundation for an original sportsbook platform with football data integration, custom odds, realtime WebSocket updates, wallet ledger, gifts and administration.
+Backend foundation for an original sportsbook platform with live football, custom odds, wallets and gifts.
 
-## Current foundation
+## Stack
 
 - Node.js 20+
-- TypeScript
-- Express
+- TypeScript + Express
 - PostgreSQL + Prisma
 - JWT authentication
-- Google reCAPTCHA verification on registration and login
-- Rate limiting and Helmet security headers
-- WebSocket endpoint for realtime sports/odds infrastructure
-- User roles
-- Wallet ledger foundation
-- Football sports/competition/event models
-- Gift catalog and claim API
-- Audit-log model
+- Google reCAPTCHA verification on public registration/login only
+- WebSocket realtime channel
+- API-Sports / API-Football server-side integration
+
+## API-Football integration
+
+The backend keeps the API-Sports key server-side. Browsers call our `/api/football/*` endpoints; they never receive the provider key.
+
+Environment variables:
+
+```env
+API_SPORTS_KEY=your-key
+FOOTBALL_API_BASE_URL=https://v3.football.api-sports.io
+```
+
+Do not commit the real key to GitHub. For Render, add `API_SPORTS_KEY` in the service's Environment Variables and redeploy.
+
+Available endpoints:
+
+- `GET /api/football/status`
+- `GET /api/football/countries`
+- `GET /api/football/leagues`
+- `GET /api/football/fixtures`
+- `GET /api/football/live`
+- `GET /api/football/fixture/:id`
+- `GET /api/football/standings?league=39&season=2025`
+- `GET /api/football/odds/:fixtureId`
+- `GET /api/football/odds/live/:fixtureId`
+
+The football provider is a data source only. Our sportsbook will own its own markets, odds calculation, betslips, bets and settlement logic.
 
 ## reCAPTCHA
 
-The frontend must obtain a Google reCAPTCHA token and send it as `recaptchaToken` on both registration and login. The backend verifies the token directly with Google. Never send `RECAPTCHA_SECRET_KEY` to the browser or commit it to Git.
+The backend expects `recaptchaToken` on registration and login. The reCAPTCHA widget/token should be rendered only on those public authentication pages in the frontend. It is not required on the authenticated dashboard or normal sportsbook pages.
 
-The verification middleware accepts checkbox-style responses and score/action responses. For reCAPTCHA v3, the configured action and minimum score are checked.
+Keep `RECAPTCHA_SECRET_KEY` server-side. The frontend should use Google's public site key to obtain the token and send that token to `/api/auth/register` or `/api/auth/login`.
 
-## Setup
+## Run locally
 
 ```bash
 npm install
-cp .env.example .env
 npm run prisma:generate
-npm run prisma:migrate -- --name init
-npm run dev
+npm run build
+npm start
 ```
 
-Health endpoint: `GET /health`
-
-Authentication: `POST /api/auth/register`, `POST /api/auth/login`
-
-Gifts: `GET /api/gifts`, `GET /api/gifts/mine`, `POST /api/gifts/:giftId/claim`
-
-Realtime: `ws://localhost:4000/ws`
-
-## Architecture direction
-
-The football provider is intentionally separated from the betting engine. A future provider adapter will ingest fixtures, live scores and match events into our own database. Our own odds engine will calculate and publish authoritative odds through the WebSocket layer. Provider odds do not need to be the source of truth.
-
-Financial operations use integer minor units (`BigInt`) and immutable wallet transaction records. Real-money payment processing is not enabled in this initial foundation.
-
-## Security
-
-- Keep secrets in environment variables.
-- Use HTTPS in production.
-- Use a strong random `JWT_SECRET` of at least 32 characters.
-- Configure CORS to the real frontend origin.
-- Add KYC, responsible-gambling, payment-provider and jurisdiction controls before enabling real-money betting.
+Copy `.env.example` to `.env` and fill in the required values.
