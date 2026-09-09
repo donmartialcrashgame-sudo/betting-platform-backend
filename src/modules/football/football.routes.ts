@@ -64,6 +64,32 @@ router.get('/fixtures', async (req, res) => {
   }
 });
 
+// Convenient football-first endpoint for the frontend home page.
+// It performs one provider request and returns fixtures for the supplied date.
+router.get('/today', async (req, res) => {
+  const timezone = typeof req.query.timezone === 'string' ? req.query.timezone : 'Africa/Lagos';
+  const date = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).format(new Date());
+
+  try {
+    const data = await footballGet('/fixtures', { date, timezone });
+    return res.json({
+      ok: true,
+      date,
+      timezone,
+      data: data.response,
+      results: data.results,
+      paging: data.paging
+    });
+  } catch (error) {
+    return handleError(res, error);
+  }
+});
+
 router.get('/live', async (_req, res) => {
   try {
     const data = await footballGet('/fixtures', { live: 'all' });
