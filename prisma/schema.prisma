@@ -4,7 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Development fallback. The runtime Prisma client overrides this with DATABASE_URL when supplied.
+  url      = "postgresql://postgres:postgres@localhost:5432/postgres"
 }
 
 enum UserStatus {
